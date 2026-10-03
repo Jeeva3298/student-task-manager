@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Edit Task | Student Task Manager{% endblock %}
+{% block container_class %}narrow{% endblock %}
+{% block content %}
+<section class="form-card">
+    <h1>Edit Task</h1>
+    <form method="post" action="{{ url_for('task.edit_task', task_id=task.id) }}" data-validate="task">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label for="title">Task Title</label>
+        <input type="text" id="title" name="title" value="{{ task.title }}" required>
+
+        <label for="description">Description</label>
+        <textarea id="description" name="description" rows="4">{{ task.description or '' }}</textarea>
+
+        <label for="due_date">Due Date</label>
+        <input type="date" id="due_date" name="due_date" value="{% if task.due_date %}{{ task.due_date.strftime('%Y-%m-%d') if task.due_date.strftime is defined else task.due_date }}{% endif %}" required>
+
+        <label for="priority">Priority</label>
+        <select id="priority" name="priority" required>
+            {% for option in ['Low', 'Medium', 'High'] %}
+            <option value="{{ option }}" {% if task.priority == option %}selected{% endif %}>{{ option }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="status">Status</label>
+        <select id="status" name="status" required>
+            {% for option in ['Pending', 'Completed'] %}
+            <option value="{{ option }}" {% if task.status == option %}selected{% endif %}>{{ option }}</option>
+            {% endfor %}
+        </select>
+
+        <div class="form-actions">
+            <a class="btn" href="{{ url_for('task.dashboard') }}">Cancel</a>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

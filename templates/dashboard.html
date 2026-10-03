@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | Student Task Manager{% endblock %}
+{% block content %}
+<section class="page-header">
+    <h1>Welcome, {{ user.name }}</h1>
+    <a class="btn btn-primary" href="{{ url_for('task.add_task') }}">+ Add Task</a>
+</section>
+
+<section class="stats">
+    <article class="stat-card">
+        <p>Total Tasks</p>
+        <strong>{{ total }}</strong>
+    </article>
+    <article class="stat-card pending">
+        <p>Pending</p>
+        <strong>{{ pending }}</strong>
+    </article>
+    <article class="stat-card completed">
+        <p>Completed</p>
+        <strong>{{ completed }}</strong>
+    </article>
+</section>
+
+<section class="task-panel">
+    {% if tasks %}
+    <div class="table-wrap">
+        <table class="task-table">
+            <thead>
+                <tr>
+                    <th>Task</th>
+                    <th>Due Date</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in tasks %}
+                <tr>
+                    <td>
+                        <div class="task-title">{{ task.title }}</div>
+                        {% if task.description %}
+                        <div class="task-desc">{{ task.description }}</div>
+                        {% endif %}
+                    </td>
+                    <td>{{ task.due_date | format_date }}</td>
+                    <td><span class="badge priority-{{ task.priority | lower }}">{{ task.priority }}</span></td>
+                    <td><span class="badge status-{{ task.status | lower }}">{{ task.status }}</span></td>
+                    <td class="actions">
+                        <a class="btn btn-small" href="{{ url_for('task.edit_task', task_id=task.id) }}">Edit</a>
+                        {% if task.status != 'Completed' %}
+                        <form method="post" action="{{ url_for('task.complete_task', task_id=task.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-small btn-success">Complete</button>
+                        </form>
+                        {% endif %}
+                        <form method="post" action="{{ url_for('task.delete_task', task_id=task.id) }}" data-confirm="Are you sure you want to delete this task?">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-small btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="empty">No tasks yet. Add your first task to get started.</p>
+    {% endif %}
+</section>
+{% endblock %}
